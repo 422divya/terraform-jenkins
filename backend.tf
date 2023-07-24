@@ -1,11 +1,23 @@
-resource "aws_dynamodb_table" "db" {
-   name = "state-db"
-   billing_mode = "PAY_PER_REQUEST"
-   hash_key = "LOCK_ID"
-
- attribute {
-     name = "LOCK_ID"
-     type= "S"
+terraform {
+  required_providers {
+           aws = {
+              source = "hashicorp/aws"
+              version = "5.1.0"
+ 
+}
 }
 
+backend "s3" {
+
+ bucket = "bucket-terraform-1"
+ key = "terraform-state/state.tf"
+ region = "ap-northeast-1"
+ dynamodb_table = "state-db"
+   
+}
+
+}
+
+provider "aws" {
+ region = "ap-northeast-1"
 }
