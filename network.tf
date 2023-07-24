@@ -9,7 +9,7 @@ resource "aws_vpc" "vpc" {
 
 resource "aws_subnet" "pub-subnet" {
    vpc_id = aws_vpc.vpc.id
-   cidr_block = "10.0.0.1/24"
+   cidr_block = "10.0.0.0/24"
    map_public_ip_on_launch = "true"
    availability_zone = "ap-northeast-1a"
    tags = {
@@ -55,7 +55,7 @@ resource "aws_route_table_association" "route-subnet" {
 
 resource "aws_security_group" "sg" {
   name   = "HTTP and SSH"
-  vpc_id = aws_vpc.some_custom_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   ingress {
     from_port   = 80
