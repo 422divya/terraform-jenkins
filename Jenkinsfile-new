@@ -1,0 +1,112 @@
+pipeline {
+    
+    agent {
+        
+        label 'Terraform'
+    }
+    
+    
+    stages {
+        
+        stage("pull terraform code from github") {
+            
+            steps {
+                
+                 git branch: 'main', url: 'https://github.com/422divya/terraform-jenkins.git'
+            }
+            
+        }
+        
+       
+        stage("Terraform init") {
+             
+            steps {
+                
+               
+                
+                sh "terraform init"
+                
+                
+            }
+            
+        }
+        
+        
+        stage("validate the terraform code") {
+            
+            steps {
+                sh "terraform validate"
+            }
+        }
+        
+        stage("Terraform Plan") {
+            
+            steps {
+                
+
+                sh "terraform plan -out terraform-Test.tfplan; echo \$? > status"
+            
+            
+        }
+        }
+        
+        
+        
+        stage("Terraform Apply") {
+            
+            steps {
+
+                script {
+                    
+                    def apply = false
+                    input message: 'Kindly confirm whether to apply the plan', ok: 'Ready to apply the plan'
+                    apply = true
+                    
+                    
+                    if (apply) {
+                        sh 'terraform $Option terraform-Test.tfplan'
+                    }
+                
+            }
+            
+        }
+        }
+        
+        
+        stage("Destroy") {
+            
+            steps {
+                sh 'terraform $Option -auto-approve'  
+                
+            
+        }
+        }
+        
+        
+        
+        
+    }
+    
+    
+    post {
+        
+        
+        
+    failure {
+        script {
+            emailext body: 'The Jenkins pipeline has failed. Please check the console output for more details.', subject: 'Jenkins Pipeline Failure', to: 'divyaprabhu422@gmail.com'
+            
+        }
+    }
+    
+    success {
+        script {
+            emailext body: 'The Jenkins pipeline has successfull. Please check the console output for more details.', subject: 'Jenkins Pipeline Failure', to: 'divyaprabhu422@gmail.com'
+            
+        }
+    }
+    
+    }
+    
+}    
+    
